@@ -73,6 +73,11 @@ contract('WalletFactory', (accounts) => {
     assert.equal(addressSet.size, numWallets)
   })
 
+  it('should require to generate at least one wallet', async () => {
+    const fn = walletFactoryInstance.generateMany(0)
+    await truffleAssert.reverts(fn)
+  })
+
   contract('Wallet', () => {
     let walletInstance
     let tokenInstance
@@ -169,10 +174,12 @@ contract('WalletFactory', (accounts) => {
       const masterBalanceAfter = await tokenInstance.balanceOf(master)
       assert.equal(toBN(masterBalanceAfter).toString(), (toBN(masterBalanceBefore).add(amount)).toString())
     })
+
     it('should not allow any caller to invoke the "setup" function again', async () => {
       const fn = walletInstance.setup({from: accounts[7]})
       await truffleAssert.reverts(fn, 'Wallet: cannot call setup twice')
     })
+
     it('should be able to collect both ether and ERC20 tokens in a single transaction', async () => {
       const amount = toBN(1e16)
 
@@ -217,6 +224,11 @@ contract('WalletFactory', (accounts) => {
       assert.equal(walletTokenBalanceAfter, '0')
       const masterTokenBalanceAfter = await tokenInstance.balanceOf(master)
       assert.equal(masterTokenBalanceAfter, toBN(masterTokenBalanceBefore).add(amount).toString())
+    })
+
+    it('should require at least one element when calling `collectMany`', async () => {
+      const fn = walletInstance.collectMany([])
+      await truffleAssert.reverts(fn, 'Wallet: at least one asset must be specified')
     })
   })
 })
