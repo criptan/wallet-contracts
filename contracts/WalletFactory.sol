@@ -20,7 +20,7 @@ contract WalletFactory is Ownable {
         setMaster(_master);
     }
 
-    function setMaster(address payable _newMaster) onlyOwner public {
+    function setMaster(address payable _newMaster) public onlyOwner {
         require(_newMaster != address(0), "WalletFactory: master address cannot be zero");
 
         address oldMaster = master;
