@@ -1,0 +1,21 @@
+{
+  "name": "wallet-contracts",
+  "version": "1.0.0",
+  "repository": "git@github.com:criptan/wallet-contracts.git",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "truffle build",
+    "test": "truffle test",
+    "ganache": "ganache-cli -p 7545"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.2.0"
+  },
+  "devDependencies": {
+    "@openzeppelin/test-helpers": "^0.5.12",
+    "truffle": "^5.4.1",
+    "ganache-cli": "^6.12.2",
+    "truffle-assertions": "^0.9.2"
+  }
+}
