@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @dev Implementation of the generic wallet contract.
- * This implementation intends to allow receiving any ERC20 token and ether, at the same
+ * This implementation intends to allow receiving any ERC20 token and ether at the same
  * time it constraints sending (also called "collecting") to only one address.
  *
  * That address is specified by the `WalletFactory` contract.
@@ -18,7 +18,7 @@ contract Wallet {
     event EtherReceived(address indexed sender, uint amount);
 
     /**
-     * @dev Event fire upon sending `amount` ether to `receiver`.
+     * @dev Event fired upon sending `amount` ether to `receiver`.
      */
     event EtherSent(address indexed receiver, uint amount);
 
@@ -40,7 +40,7 @@ contract Wallet {
     /**
      * @dev Gets the master address where funds will be transferred to.
      */
-    function master() public returns (address payable) {
+    function master() public view returns (address payable) {
         return factory.master();
     }
 
