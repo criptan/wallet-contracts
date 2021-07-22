@@ -14,6 +14,7 @@
     "@openzeppelin/contracts": "^4.2.0"
   },
   "devDependencies": {
+    "solidity-coverage": "^0.7.16",
     "dotenv": "^10.0.0",
     "solhint": "^3.3.6",
     "truffle-hdwallet-provider": "^1.0.17",

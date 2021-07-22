@@ -1,12 +1,13 @@
 require('dotenv').config()
-const HDWalletProvider = require("truffle-hdwallet-provider")
+const HDWalletProvider = require('truffle-hdwallet-provider')
 
 module.exports = {
+  plugins: ['solidity-coverage'],
   networks: {
     development: {
-      host: "127.0.0.1",
+      host: '127.0.0.1',
       port: 7545,
-      network_id: "*"
+      network_id: '*'
     },
     mainnet: {
       provider: () => new HDWalletProvider(process.env.MNEMONIC, `https://mainnet.infura.io/v3/${process.env.INFURA_PROJECT_ID}`),
@@ -24,8 +25,8 @@ module.exports = {
   },
   compilers: {
     solc: {
-      version: "0.8.6",
-      parser: "solcjs",
+      version: '0.8.6',
+      parser: 'solcjs',
       optimizer: {
         enabled: true,
         runs: 200
