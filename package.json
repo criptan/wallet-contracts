@@ -8,7 +8,8 @@
     "build": "truffle build",
     "test": "truffle test",
     "ganache": "ganache-cli -p 7545",
-    "lint": "solhint 'contracts/*.sol'"
+    "lint": "solhint 'contracts/*.sol'",
+    "coverage": "truffle run coverage"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.2.0"
