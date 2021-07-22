@@ -36,14 +36,21 @@ contract Wallet {
 
         factory = WalletFactory(msg.sender);
     }
+    
+    /**
+     * @dev Gets the master address where funds will be transferred to.
+     */
+    function master() public returns (address payable) {
+        return factory.master();
+    }
 
     /**
      * @dev Collects all available ether and sends it to the master address.
      */
     function collectEther() public returns (uint) {
         uint balance = address(this).balance;
-        factory.master().transfer(balance);
-        emit EtherSent(factory.master(), balance);
+        master().transfer(balance);
+        emit EtherSent(master(), balance);
         return balance;
     }
 
@@ -57,7 +64,7 @@ contract Wallet {
         } else {
             IERC20 token = IERC20(_asset);
             balance = token.balanceOf(address(this));
-            require(token.transfer(factory.master(), balance), "Wallet: could not transfer the ERC20 tokens");
+            require(token.transfer(master(), balance), "Wallet: could not transfer the ERC20 tokens");
         }
         return balance;
     }

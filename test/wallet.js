@@ -1,7 +1,7 @@
 const truffleAssert = require('truffle-assertions')
 const {constants} = require('@openzeppelin/test-helpers')
 
-const ERC20 = artifacts.require('@openzeppelin/contracts/ERC20PresetMinterPauser');
+const ERC20 = artifacts.require('@openzeppelin/contracts/ERC20PresetMinterPauser')
 const Wallet = artifacts.require("Wallet")
 const WalletFactory = artifacts.require("WalletFactory")
 
@@ -12,9 +12,10 @@ contract('WalletFactory', (accounts) => {
   const master = accounts[5]
   const creator = accounts[0]
   let walletFactoryInstance
+  let template
 
   beforeEach(async () => {
-    const template = await Wallet.new()
+    template = await Wallet.new()
     walletFactoryInstance = await WalletFactory.new(master, template.address)
   })
 
@@ -77,6 +78,20 @@ contract('WalletFactory', (accounts) => {
     const fn = walletFactoryInstance.generateMany(0)
     await truffleAssert.reverts(fn)
   })
+  
+  it('should hold the correct master address', async () => {
+    const actualMasterAddress = await walletFactoryInstance.master.call()
+    assert.equal(actualMasterAddress, master)
+  })
+  
+  it('should not matter whether the template has called "setup" previously or not', async () => {
+    await template.setup({from: accounts[8]})
+    const tx = await walletFactoryInstance.generate()
+    const walletContractAddress = tx.receipt.logs[0].args.generatedAddress
+    const walletInstance = await Wallet.at(walletContractAddress)
+    const masterAddress = await walletInstance.master.call()
+    assert.equal(masterAddress, master)
+  })
 
   contract('Wallet', () => {
     let walletInstance
@@ -137,6 +152,7 @@ contract('WalletFactory', (accounts) => {
         receiver: master,
         amount,
       })
+      
       // checking balances after
       const walletBalanceAfter = await web3.eth.getBalance(walletInstance.address)
       assert.equal('0', walletBalanceAfter)
@@ -168,6 +184,7 @@ contract('WalletFactory', (accounts) => {
         to: master,
         value: amount,
       })
+      
       // checking balances after
       const walletBalanceAfter = await tokenInstance.balanceOf(walletInstance.address)
       assert.equal('0', walletBalanceAfter)
@@ -229,6 +246,13 @@ contract('WalletFactory', (accounts) => {
     it('should require at least one element when calling `collectMany`', async () => {
       const fn = walletInstance.collectMany([])
       await truffleAssert.reverts(fn, 'Wallet: at least one asset must be specified')
+    })
+    
+    it('should return the correct master address defined by the WalletFactory', async () => {
+      const walletFactoryActualMasterAddress = await walletFactoryInstance.master.call()
+      assert.equal(walletFactoryActualMasterAddress, master)
+      const walletActualMasterAddress = await walletInstance.master.call()
+      assert.equal(walletActualMasterAddress, master)
     })
   })
 })
