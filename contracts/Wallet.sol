@@ -12,16 +12,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * That address is specified by the `WalletFactory` contract.
  */
 contract Wallet {
-    /**
-     * @dev Event fired upon receiving `amount` ether from `sender`.
-     */
-    event EtherReceived(address indexed sender, uint amount);
-
-    /**
-     * @dev Event fired upon sending `amount` ether to `receiver`.
-     */
-    event EtherSent(address indexed receiver, uint amount);
-
     WalletFactory public factory;
 
     /**
@@ -50,7 +40,6 @@ contract Wallet {
     function collectEther() public returns (uint) {
         uint balance = address(this).balance;
         master().transfer(balance);
-        emit EtherSent(master(), balance);
         return balance;
     }
 
@@ -71,7 +60,7 @@ contract Wallet {
 
     /**
      * @dev Collects several tokens and ether at once and sends it all to the master address.
-    */
+     */
     function collectMany(address[] calldata _assets) public returns (uint[] memory) {
         require(_assets.length > 0, "Wallet: at least one asset must be specified");
 
@@ -86,6 +75,6 @@ contract Wallet {
      * @dev Method to log whenever ether is received by this contract.
      */
     receive() external payable {
-        emit EtherReceived(msg.sender, msg.value);
+        factory.notifyEtherReceived(msg.sender, msg.value);
     }
 }

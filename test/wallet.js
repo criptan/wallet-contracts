@@ -123,9 +123,10 @@ contract('WalletFactory', (accounts) => {
         value: amount,
       })
       assert.isOk(tx.status)
-      const result = await truffleAssert.createTransactionResult(walletInstance, tx.transactionHash)
+      const result = await truffleAssert.createTransactionResult(walletFactoryInstance, tx.transactionHash)
       truffleAssert.eventEmitted(result, 'EtherReceived', {
         sender,
+        receiver: walletInstance.address,
         amount,
       })
       const balance = await web3.eth.getBalance(walletInstance.address)
@@ -148,10 +149,6 @@ contract('WalletFactory', (accounts) => {
       // collecting the balance
       const tx = await walletInstance.collectEther()
       assert.isOk(tx.receipt.status)
-      truffleAssert.eventEmitted(tx, 'EtherSent', {
-        receiver: master,
-        amount,
-      })
       
       // checking balances after
       const walletBalanceAfter = await web3.eth.getBalance(walletInstance.address)
@@ -219,10 +216,6 @@ contract('WalletFactory', (accounts) => {
       // collecting funds
       const tx = await walletInstance.collectMany([ZERO_ADDRESS, tokenInstance.address])
       assert.isOk(tx.receipt.status)
-      truffleAssert.eventEmitted(tx, 'EtherSent', {
-        receiver: master,
-        amount,
-      })
       const result = await truffleAssert.createTransactionResult(tokenInstance, tx.receipt.transactionHash)
       truffleAssert.eventEmitted(result, 'Transfer', {
         from: walletInstance.address,
