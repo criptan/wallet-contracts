@@ -7,6 +7,7 @@ const WalletFactory = artifacts.require("WalletFactory")
 
 const {ZERO_ADDRESS} = constants
 const toBN = web3.utils.toBN
+const salt = "0x3b4a741ce135d043acc7fba2ad0f64e9b97e169ebc0f867117eed224005cad4a";
 
 contract('WalletFactory', (accounts) => {
   const master = accounts[5]
@@ -61,23 +62,6 @@ contract('WalletFactory', (accounts) => {
     const fn = walletFactoryInstance.setMaster(sender, {from: sender})
     await truffleAssert.reverts(fn)
   })
-
-  it('should be able to create many new wallets at once', async () => {
-    const numWallets = 10
-    const tx = await walletFactoryInstance.generateMany(numWallets)
-    const addressSet = new Set()
-    truffleAssert.eventEmitted(tx, 'AddressGenerated', (event) => {
-      addressSet.add(event.generatedAddress)
-      return true
-    })
-    // all wallets must have different addresses
-    assert.equal(addressSet.size, numWallets)
-  })
-
-  it('should require to generate at least one wallet', async () => {
-    const fn = walletFactoryInstance.generateMany(0)
-    await truffleAssert.reverts(fn)
-  })
   
   it('should hold the correct master address', async () => {
     const actualMasterAddress = await walletFactoryInstance.master.call()
@@ -86,12 +70,22 @@ contract('WalletFactory', (accounts) => {
   
   it('should not matter whether the template has called "setup" previously or not', async () => {
     await template.setup({from: accounts[8]})
-    const tx = await walletFactoryInstance.generate()
+    const tx = await walletFactoryInstance.generate(salt)
     const walletContractAddress = tx.receipt.logs[0].args.generatedAddress
     const walletInstance = await Wallet.at(walletContractAddress)
     const masterAddress = await walletInstance.master.call()
     assert.equal(masterAddress, master)
   })
+
+
+  it('should generate the correct address for a given salt', async () => {
+    await template.setup({from: accounts[8]})
+    const tx = await walletFactoryInstance.generate(salt)
+    const walletContractAddress = tx.receipt.logs[0].args.generatedAddress
+    const computedAddress = await walletFactoryInstance.computeAddress(salt)
+    assert.equal(computedAddress, walletContractAddress)
+  })
+
 
   contract('Wallet', () => {
     let walletInstance
@@ -99,7 +93,7 @@ contract('WalletFactory', (accounts) => {
     const tokenOwner = accounts[3]
 
     beforeEach(async () => {
-      const tx = await walletFactoryInstance.generate()
+      const tx = await walletFactoryInstance.generate(salt)
       const walletContractAddress = tx.receipt.logs[0].args.generatedAddress
       truffleAssert.eventEmitted(tx, 'AddressGenerated', {
         generatedAddress: walletContractAddress,

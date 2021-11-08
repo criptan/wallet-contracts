@@ -66,25 +66,16 @@ contract WalletFactory is Ownable {
     /**
      * @dev Generates a new `Wallet` contract using cloning method and returns its address.
      */
-    function generate() public returns (address) {
-        address clone = template.clone();
+    function generate(bytes32 _salt) public returns (address) {
+        address clone = template.cloneDeterministic(_salt);
         Wallet(payable(clone)).setup();
         generatedAddresses[clone] = true;
         emit AddressGenerated(clone);
         return clone;
     }
-
-    /**
-     * @dev Generates several new `Wallet` contracts at once and returns their addresses.
-     */
-    function generateMany(uint _numWallets) public returns (address[] memory) {
-        require(_numWallets > 0, "WalletFactory: you must specify a number of wallets greater than zero");
-
-        address[] memory newAddresses = new address[](_numWallets);
-        for (uint i = 0; i < _numWallets; i++) {
-            newAddresses[i] = generate();
-        }
-        return newAddresses;
+    
+    function computeAddress(bytes32 _salt) public view returns (address) {
+        return template.predictDeterministicAddress(_salt, address(this));
     }
 
     /**
