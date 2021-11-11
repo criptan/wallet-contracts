@@ -12,11 +12,15 @@ const salt = "0x3b4a741ce135d043acc7fba2ad0f64e9b97e169ebc0f867117eed224005cad4a
 contract('WalletFactory', (accounts) => {
   const master = accounts[5]
   const creator = accounts[0]
+  const tokenOwner = accounts[3]
   let walletFactoryInstance
   let template
+  let tokenInstance
 
   beforeEach(async () => {
     template = await Wallet.new()
+    tokenInstance = await ERC20.new('Test token', 'TST', {from: tokenOwner})
+    await tokenInstance.mint(tokenOwner, toBN(1000).mul(toBN(10).pow(toBN(18))), {from: tokenOwner})
     walletFactoryInstance = await WalletFactory.new(master, template.address)
   })
 
@@ -70,30 +74,62 @@ contract('WalletFactory', (accounts) => {
   
   it('should not matter whether the template has called "setup" previously or not', async () => {
     await template.setup({from: accounts[8]})
-    const tx = await walletFactoryInstance.generate(salt)
+    const tx = await walletFactoryInstance.generate(salt, [])
     const walletContractAddress = tx.receipt.logs[0].args.generatedAddress
     const walletInstance = await Wallet.at(walletContractAddress)
     const masterAddress = await walletInstance.master.call()
     assert.equal(masterAddress, master)
   })
-
-
+  
   it('should generate the correct address for a given salt', async () => {
     await template.setup({from: accounts[8]})
-    const tx = await walletFactoryInstance.generate(salt)
+    const tx = await walletFactoryInstance.generate(salt, [])
     const walletContractAddress = tx.receipt.logs[0].args.generatedAddress
     const computedAddress = await walletFactoryInstance.computeAddress(salt)
     assert.equal(computedAddress, walletContractAddress)
   })
 
+  it('should collect funds when deploying the wallet contract', async () => {
+    await template.setup({from: accounts[8]})
+    const amount = toBN(1e16)  // 0.01 ETH
+    const sender = accounts[1]
+    const computedAddress = await walletFactoryInstance.computeAddress(salt)
+    
+    let etherBalance = toBN(await web3.eth.getBalance(computedAddress))
+    assert.equal(etherBalance, '0')
+    let tokenBalance = toBN(await tokenInstance.balanceOf(computedAddress))
+    assert.equal(tokenBalance.toString(), '0')
+    
+    const tx1 = await web3.eth.sendTransaction({
+      from: sender,
+      to: computedAddress,
+      value: amount,
+    })
+    assert.isOk(tx1.status)
+    etherBalance = await web3.eth.getBalance(computedAddress)
+    assert.equal(etherBalance.toString(), amount.toString())
+    
+    let tx2 = await tokenInstance.transfer(computedAddress, amount, {from: tokenOwner})
+    assert.isOk(tx2.receipt.status)
+    tokenBalance = toBN(await tokenInstance.balanceOf(computedAddress))
+    assert.equal(tokenBalance.toString(), amount.toString())
+    
+    const tx3 = await walletFactoryInstance.generate(salt, [ZERO_ADDRESS, tokenInstance.address])
+    assert.isOk(tx3.receipt.status)
+    const walletContractAddress = tx3.receipt.logs[0].args.generatedAddress
+    assert.equal(computedAddress, walletContractAddress)
+
+    etherBalance = toBN(await web3.eth.getBalance(computedAddress))
+    assert.equal(etherBalance, '0')
+    tokenBalance = toBN(await tokenInstance.balanceOf(computedAddress))
+    assert.equal(tokenBalance.toString(), '0')
+  })
 
   contract('Wallet', () => {
     let walletInstance
-    let tokenInstance
-    const tokenOwner = accounts[3]
 
     beforeEach(async () => {
-      const tx = await walletFactoryInstance.generate(salt)
+      const tx = await walletFactoryInstance.generate(salt, [])
       const walletContractAddress = tx.receipt.logs[0].args.generatedAddress
       truffleAssert.eventEmitted(tx, 'AddressGenerated', {
         generatedAddress: walletContractAddress,

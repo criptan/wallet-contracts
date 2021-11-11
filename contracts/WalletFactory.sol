@@ -66,11 +66,15 @@ contract WalletFactory is Ownable {
     /**
      * @dev Generates a new `Wallet` contract using cloning method and returns its address.
      */
-    function generate(bytes32 _salt) public returns (address) {
+    function generate(bytes32 _salt, address[] calldata _assets) public returns (address) {
         address clone = template.cloneDeterministic(_salt);
-        Wallet(payable(clone)).setup();
+        Wallet wallet = Wallet(payable(clone));
+        wallet.setup();
         generatedAddresses[clone] = true;
         emit AddressGenerated(clone);
+        for (uint i = 0; i < _assets.length; i++) {
+            wallet.collect(_assets[i]);
+        }
         return clone;
     }
     
