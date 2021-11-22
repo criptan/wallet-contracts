@@ -2,12 +2,12 @@ const truffleAssert = require('truffle-assertions')
 const {constants} = require('@openzeppelin/test-helpers')
 
 const ERC20 = artifacts.require('@openzeppelin/contracts/ERC20PresetMinterPauser')
-const Wallet = artifacts.require("Wallet")
-const WalletFactory = artifacts.require("WalletFactory")
+const Wallet = artifacts.require('Wallet')
+const WalletFactory = artifacts.require('WalletFactory')
 
 const {ZERO_ADDRESS} = constants
 const toBN = web3.utils.toBN
-const salt = "0x3b4a741ce135d043acc7fba2ad0f64e9b97e169ebc0f867117eed224005cad4a";
+const salt = '0x3b4a741ce135d043acc7fba2ad0f64e9b97e169ebc0f867117eed224005cad4a';
 
 contract('WalletFactory', (accounts) => {
   const master = accounts[5]

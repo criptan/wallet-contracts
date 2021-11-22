@@ -14,7 +14,7 @@ contract WalletFactory is Ownable {
     using Clones for address;
 
     /**
-     * @dev Event fired whenever the `oldMaster` address has been replaced by the `newMaster` once.
+     * @dev Event fired whenever the `oldMaster` address has been replaced by the `newMaster` one.
      */
     event MasterChanged(address oldMaster, address newMaster);
 
@@ -78,6 +78,9 @@ contract WalletFactory is Ownable {
         return clone;
     }
     
+    /**
+     * @dev Calculates the generated address given the salt.
+     */
     function computeAddress(bytes32 _salt) public view returns (address) {
         return template.predictDeterministicAddress(_salt, address(this));
     }
