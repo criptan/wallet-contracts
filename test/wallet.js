@@ -7,7 +7,7 @@ const WalletFactory = artifacts.require('WalletFactory')
 
 const {ZERO_ADDRESS} = constants
 const toBN = web3.utils.toBN
-const salt = '0x3b4a741ce135d043acc7fba2ad0f64e9b97e169ebc0f867117eed224005cad4a';
+const salt = '0x3b4a741ce135d043acc7fba2ad0f64e9b97e169ebc0f867117eed224005cad4a'
 
 contract('WalletFactory', (accounts) => {
   const master = accounts[5]
@@ -87,6 +87,18 @@ contract('WalletFactory', (accounts) => {
     const walletContractAddress = tx.receipt.logs[0].args.generatedAddress
     const computedAddress = await walletFactoryInstance.computeAddress(salt)
     assert.equal(computedAddress, walletContractAddress)
+  })
+  
+  it('should return whether there is an already generated contract or not', async () => {
+    await template.setup({from: accounts[8]})
+    const computedAddress = await walletFactoryInstance.computeAddress(salt)
+    let isGenerated = await walletFactoryInstance.isWalletGenerated(salt)
+    assert.isNotOk(isGenerated)
+    const tx = await walletFactoryInstance.generate(salt, [])
+    const walletContractAddress = tx.receipt.logs[0].args.generatedAddress
+    assert.equal(walletContractAddress, computedAddress)
+    isGenerated = await walletFactoryInstance.isWalletGenerated(salt)
+    assert.isOk(isGenerated)
   })
 
   it('should collect funds when deploying the wallet contract', async () => {
