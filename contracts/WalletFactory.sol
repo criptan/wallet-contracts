@@ -74,8 +74,8 @@ contract WalletFactory is Ownable {
         wallet.setup();
         generatedAddresses[clone] = true;
         emit AddressGenerated(clone);
-        for (uint i = 0; i < _assets.length; i++) {
-            wallet.collect(_assets[i]);
+        if (_assets.length > 0) {
+            wallet.collectMany(_assets);
         }
         return clone;
     }
