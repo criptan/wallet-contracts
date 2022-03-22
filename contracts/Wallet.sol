@@ -2,6 +2,8 @@ pragma solidity 0.8.6;
 
 import "./WalletFactory.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
 
 /**
@@ -12,6 +14,9 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * That address is specified by the `WalletFactory` contract.
  */
 contract Wallet {
+    using SafeERC20 for IERC20;
+    using Address for address payable;
+    
     WalletFactory public factory;
 
     /**
@@ -39,7 +44,7 @@ contract Wallet {
      */
     function collectEther() public returns (uint) {
         uint balance = address(this).balance;
-        master().transfer(balance);
+        master().sendValue(balance);
         return balance;
     }
 
@@ -53,7 +58,7 @@ contract Wallet {
         } else {
             IERC20 token = IERC20(_asset);
             balance = token.balanceOf(address(this));
-            require(token.transfer(master(), balance), "Wallet: could not transfer the ERC20 tokens");
+            token.safeTransfer(master(), balance);
         }
         return balance;
     }
