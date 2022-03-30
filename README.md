@@ -38,6 +38,6 @@ $ yarn run ganache
 $ yarn run test
 ```
 
-## Security concerns
+## Security Audit
 
-
+The security audit was carried out by [Omniscia](https://omniscia.io/). You can find it [here](https://omniscia.io/criptan-wallet-implementation/compilation).
