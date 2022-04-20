@@ -89,7 +89,7 @@ contract WalletFactory is Ownable {
 
     /**
      * @dev Checks whether the provided salt would generate a contract that already exists or not.
-     * @return 'bool' Wheter it exists or no
+     * @return 'bool' Whether it exists or not
      */
     function isWalletGenerated(bytes32 _salt) public view returns (bool) {
         address computedAddress = computeAddress(_salt);
