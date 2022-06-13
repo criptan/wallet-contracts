@@ -19,6 +19,12 @@ module.exports = {
       networkCheckTimeout: 3000,
       skipDryRun: true
     },
+    goerli: {
+      provider: () => new HDWalletProvider(process.env.MNEMONIC, `https://goerli.infura.io/v3/${process.env.INFURA_PROJECT_ID}`),
+      network_id: 5,
+      networkCheckTimeout: 3000,
+      skipDryRun: true
+    },
   },
   mocha: {
     slow: 1000
