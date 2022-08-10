@@ -24,7 +24,7 @@ module.exports = {
       network_id: 5,
       networkCheckTimeout: 3000,
       skipDryRun: true
-    },
+    }
   },
   mocha: {
     slow: 1000
@@ -36,7 +36,7 @@ module.exports = {
       optimizer: {
         enabled: true,
         runs: 200
-      },
+      }
     }
   }
 }
