@@ -12,7 +12,7 @@
     "coverage": "truffle run coverage"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.2.0"
+    "@openzeppelin/contracts": "^4.7.2"
   },
   "devDependencies": {
     "solidity-coverage": "^0.7.16",
