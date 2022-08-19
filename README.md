@@ -41,3 +41,11 @@ $ yarn run test
 ## Security Audit
 
 The security audit was carried out by [Omniscia](https://omniscia.io/). You can find it [here](https://omniscia.io/criptan-wallet-implementation/compilation).
+
+## Contract addresses
+
+### Mainnet
+
+Wallet Factory: [0x0282a224ef6f1b9056c778a00f06a8fcb5366856](https://etherscan.io/address/0x0282a224ef6f1b9056c778a00f06a8fcb5366856).
+
+Wallet: [0x0d213A76138CE362dD107773643560012091744C](https://etherscan.io/address/0x0d213A76138CE362dD107773643560012091744C).
