@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const Wallet = artifacts.require('Wallet')
 const WalletFactory = artifacts.require('WalletFactory')
 
@@ -6,7 +8,7 @@ module.exports = async (deployer, network, accounts) => {
   await deployer.deploy(Wallet)
   const template = await Wallet.deployed()
   await deployer.deploy(WalletFactory, master, template.address)
-  if (process.env.OWNER) {
+  if (process.env.OWNER && process.env.OWNER !== accounts[0]) {
     const walletFactoryInstance = await WalletFactory.deployed()
     await walletFactoryInstance.transferOwnership(process.env.OWNER)
   }
